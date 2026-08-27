@@ -181,6 +181,36 @@ setServerError("");
     minArea
   );
 };
+const updatePropertyStatus = async (propertyId, newStatus) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/properties/${propertyId}/status?status=${newStatus}&customer_id=${loggedCustomer.id}`,
+      {
+        method: "PUT",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      alert(data.message || "Failed to update property status.");
+      return;
+    }
+
+    setMyProperties((prev) =>
+      prev.map((property) =>
+        property.id === propertyId
+          ? { ...property, status: data.property.status }
+          : property
+      )
+    );
+
+    alert(`Property marked as ${data.property.status}`);
+  } catch (error) {
+    console.error(error);
+    alert("Server error while updating property status.");
+  }
+};
 const handleSellProperty = async (e) => {
   e.preventDefault();
   if (Number(sellPrice) <= 0) {
@@ -1236,6 +1266,28 @@ const handleAuth = async () => {
           >
             {property.status || "Available"}
           </span>
+          <div className="property-status-actions">
+  <button
+    type="button"
+    onClick={() => updatePropertyStatus(property.id, "available")}
+  >
+    🟢 Available
+  </button>
+
+  <button
+    type="button"
+    onClick={() => updatePropertyStatus(property.id, "rented")}
+  >
+    🟠 Rented
+  </button>
+
+  <button
+    type="button"
+    onClick={() => updatePropertyStatus(property.id, "sold")}
+  >
+    🔴 Sold
+  </button>
+</div>
 
         </div>
 
