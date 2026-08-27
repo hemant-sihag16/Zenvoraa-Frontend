@@ -1606,7 +1606,7 @@ const handleAuth = async () => {
         ×
       </button>
 
-      <h2>🏠 List Your Property</h2>
+     <h2>🏠 Want to Buy, Rent or Sell a Property?</h2>
 
       <p className="enquiries-welcome">
         Enter your property details
