@@ -1341,3 +1341,31 @@ footer p {
   border: 1px solid #ffe69c;
   max-width: 600px;
 }
+/* Property Status Buttons */
+.property-status-actions {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 15px;
+  flex-wrap: wrap;
+}
+
+.property-status-actions button {
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f5f5f5;
+  color: #333;
+}
+
+.property-status-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.property-status-actions button:active {
+  transform: translateY(0);
+}
