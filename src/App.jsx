@@ -732,7 +732,7 @@ const handleAuth = async () => {
         </div>
         <div className="sell-property-cta">
   <p className="sell-property-title">
-  🏠 Want to sell your property?
+  
 </p>
 
   <button
@@ -749,7 +749,7 @@ const handleAuth = async () => {
         className="properties-section"
         id="properties"
       >
-
+🏠 Want to Buy, Rent or Sell a Property?
         <div className="section-heading">
 
           <p>EXPLORE</p>
