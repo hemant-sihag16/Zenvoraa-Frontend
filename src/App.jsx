@@ -16,6 +16,7 @@ function App() {
   const [sellBedrooms, setSellBedrooms] = useState("");
   const [sellArea, setSellArea] = useState("");
   const [sellImageUrl, setSellImageUrl] = useState("");
+  const [sellPurpose, setSellPurpose] = useState("");
   const [minPrice, setMinPrice] = useState("");
 const [maxPrice, setMaxPrice] = useState("");
 const [bedrooms, setBedrooms] = useState("");
@@ -219,7 +220,7 @@ if (!sellLocation.trim()) {
           price: Number(sellPrice),
           bedrooms: Number(sellBedrooms),
           area: Number(sellArea),
-          purpose: "buy",
+         purpose: sellPurpose,
           image_url: sellImageUrl,
           customer_id: loggedCustomer.id,
         }),
@@ -1654,6 +1655,16 @@ const handleAuth = async () => {
           onChange={(e) => setSellArea(e.target.value)}
           required
         />
+        <select
+  value={sellPurpose}
+  onChange={(e) => setSellPurpose(e.target.value)}
+  required
+>
+  <option value="">Select Purpose</option>
+  <option value="buy">Buy</option>
+  <option value="rent">Rent</option>
+  <option value="sell">Sell</option>
+</select>
 
        <label className="sell-image-label">
   🖼️ Property Image URL
