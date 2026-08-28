@@ -779,17 +779,16 @@ const handleAuth = async () => {
           </div>
 
         </div>
-        <div className="sell-property-cta">
-  <p className="sell-property-title">
-  
-</p>
+      <div className="sell-property-cta">
+
+  <h2>🏠 Want to Buy, Rent or Sell a Property?</h2>
 
   <button
     onClick={() => setShowSellProperty(true)}
   >
-    🏠 Want to Buy, Rent or Sell a Property?
-    List Your Property
+    🏠 List Your Property
   </button>
+
 </div>
       </section>
 
