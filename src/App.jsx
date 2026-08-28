@@ -16,12 +16,13 @@ function App() {
   const [sellBedrooms, setSellBedrooms] = useState("");
   const [sellArea, setSellArea] = useState("");
   const [sellImageUrl, setSellImageUrl] = useState("");
-  const [imageUploading, setImageUploading] = useState(false);
   const [sellPurpose, setSellPurpose] = useState("");
   const [minPrice, setMinPrice] = useState("");
 const [maxPrice, setMaxPrice] = useState("");
 const [bedrooms, setBedrooms] = useState("");
 const [minArea, setMinArea] = useState("");
+const [sellImage, setSellImage] = useState(null);
+const [imageUploading, setImageUploading] = useState(false);
 
   // Selected property for details
   const [selectedProperty, setSelectedProperty] = useState(null);
