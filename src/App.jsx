@@ -16,6 +16,7 @@ function App() {
   const [sellBedrooms, setSellBedrooms] = useState("");
   const [sellArea, setSellArea] = useState("");
   const [sellImageUrl, setSellImageUrl] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
   const [sellPurpose, setSellPurpose] = useState("");
   const [minPrice, setMinPrice] = useState("");
 const [maxPrice, setMaxPrice] = useState("");
@@ -181,64 +182,74 @@ setServerError("");
     minArea
   );
 };
-const updatePropertyStatus = async (propertyId, newStatus) => {
-  try {
-    const response = await fetch(
-      `${API_URL}/properties/${propertyId}/status?status=${newStatus}&customer_id=${loggedCustomer.id}`,
-      {
-        method: "PUT",
-      }
-    );
 
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      alert(data.message || "Failed to update property status.");
-      return;
-    }
-
-    setMyProperties((prev) =>
-      prev.map((property) =>
-        property.id === propertyId
-          ? { ...property, status: data.property.status }
-          : property
-      )
-    );
-
-    alert(`Property marked as ${data.property.status}`);
-  } catch (error) {
-    console.error(error);
-    alert("Server error while updating property status.");
-  }
-};
 const handleSellProperty = async (e) => {
   e.preventDefault();
+
   if (Number(sellPrice) <= 0) {
-  alert("Please enter a valid property price.");
-  return;
-}
-if (Number(sellBedrooms) <= 0) {
-  alert("Please enter valid number of bedrooms.");
-  return;
-}
+    alert("Please enter a valid property price.");
+    return;
+  }
 
-if (Number(sellArea) <= 0) {
-  alert("Please enter a valid property area.");
-  return;
-}
-if (!sellTitle.trim()) {
-  alert("Please enter property title.");
-  return;
-}
+  if (Number(sellBedrooms) <= 0) {
+    alert("Please enter valid number of bedrooms.");
+    return;
+  }
 
-if (!sellLocation.trim()) {
-  alert("Please enter property location.");
-  return;
-}
+  if (Number(sellArea) <= 0) {
+    alert("Please enter a valid property area.");
+    return;
+  }
+
+  if (!sellTitle.trim()) {
+    alert("Please enter property title.");
+    return;
+  }
+
+  if (!sellLocation.trim()) {
+    alert("Please enter property location.");
+    return;
+  }
 
   try {
+    // ==============================
+    // 1. Upload image to Cloudinary
+    // ==============================
+
+    let uploadedImageUrl = "";
+
+    if (sellImage) {
+      setImageUploading(true);
+
+      const imageFormData = new FormData();
+      imageFormData.append("file", sellImage);
+
+      const uploadResponse = await fetch(
+        `${API_URL}/properties/upload-image`,
+        {
+          method: "POST",
+          body: imageFormData,
+        }
+      );
+
+      const uploadData = await uploadResponse.json();
+
+      if (!uploadResponse.ok || !uploadData.success) {
+        alert("Image upload failed.");
+        return;
+      }
+
+      uploadedImageUrl = uploadData.image_url;
+
+      console.log("Cloudinary Image URL:", uploadedImageUrl);
+    }
+
+    // ==============================
+    // 2. Create property
+    // ==============================
+
     const response = await fetch(
-    `${API_URL}/properties`,
+      `${API_URL}/properties`,
       {
         method: "POST",
         headers: {
@@ -250,8 +261,8 @@ if (!sellLocation.trim()) {
           price: Number(sellPrice),
           bedrooms: Number(sellBedrooms),
           area: Number(sellArea),
-         purpose: sellPurpose,
-          image_url: sellImageUrl,
+          purpose: sellPurpose,
+          image_url: uploadedImageUrl,
           customer_id: loggedCustomer.id,
         }),
       }
@@ -267,18 +278,25 @@ if (!sellLocation.trim()) {
 
     alert("🏠 Property listed successfully!");
 
+    // Reset form
     setSellTitle("");
     setSellLocation("");
     setSellPrice("");
     setSellBedrooms("");
     setSellArea("");
-    setSellImageUrl("");
+    setSellPurpose("");
+    setSellImage(null);
 
-setShowSellProperty(false);
+    setShowSellProperty(false);
+
+    // Refresh properties
+    fetchProperties();
 
   } catch (error) {
     console.error("Sell property error:", error);
     alert(error.message);
+  } finally {
+    setImageUploading(false);
   }
 };
   const handleEnquiry = async () => {
@@ -1717,25 +1735,20 @@ const handleAuth = async () => {
   <option value="rent">Rent</option>
   <option value="sell">Sell</option>
 </select>
-
-       <label className="sell-image-label">
-  🖼️ Property Image URL
+<label className="sell-image-label">
+  🖼️ Property Image
 </label>
 
 <input
-  type="url"
-  placeholder="Paste property image URL"
-  value={sellImageUrl}
-  onChange={(e) => setSellImageUrl(e.target.value)}
+  type="file"
+  accept="image/*"
+  onChange={(e) => setSellImage(e.target.files[0])}
 />
 
-<p className="sell-image-help">
-  Optional — you can add an online image URL.
-</p>
-{sellImageUrl && (
+{sellImage && (
   <div className="sell-image-preview">
     <img
-      src={sellImageUrl}
+      src={URL.createObjectURL(sellImage)}
       alt="Property Preview"
       className="sell-preview-image"
     />
@@ -1744,11 +1757,12 @@ const handleAuth = async () => {
   </div>
 )} 
         <button
-          type="submit"
-          className="login-submit"
-        >
-          🏠 List Property
-        </button>
+  type="submit"
+  className="login-submit"
+  disabled={imageUploading}
+>
+  {imageUploading ? "Uploading Image..." : "🏠 List Property"}
+</button>
 
       </form>
 
