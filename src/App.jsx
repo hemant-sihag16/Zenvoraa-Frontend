@@ -1828,21 +1828,38 @@ const handleAuth = async () => {
 
 
       {/* Footer */}
-      <footer id="contact">
+      ```jsx
+<footer id="contact">
 
-        <div className="footer-logo">
-          Zen<span>vora</span>
-        </div>
+  <div className="footer-logo">
+    Zen<span>vora</span>
+  </div>
 
-        <p>
-          Smart Real Estate Platform
-        </p>
+  <p>
+    Smart Real Estate Platform
+  </p>
 
-        <p className="copyright">
-          © 2026 Zenvoraa. All rights reserved.
-        </p>
+  <div className="footer-contact">
+    <h3>Contact Us</h3>
 
-      </footer>
+    <p>
+      📧 <a href="mailto:zenvoraa.support@gmail.com">
+        zenvoraa.support@gmail.com
+      </a>
+    </p>
+
+    <p>
+      📞 Contact Zenvoraa for property-related enquiries
+    </p>
+  </div>
+
+  <p className="copyright">
+    © 2026 Zenvoraa. All rights reserved.
+  </p>
+
+</footer>
+```
+
 
     </div>
   );
