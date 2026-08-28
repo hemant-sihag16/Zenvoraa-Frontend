@@ -1369,3 +1369,10 @@ footer p {
 .property-status-actions button:active {
   transform: translateY(0);
 }
+.logo img {
+  height: 55px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+

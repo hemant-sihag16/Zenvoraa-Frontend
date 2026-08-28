@@ -643,9 +643,7 @@ const handleAuth = async () => {
 
       {/* Navbar */}
       <nav className="navbar">
-        <div className="logo">
-          Zen<span>vora</span>
-        </div>
+        <div className="logo"><img src="/zenvoraa-logo.png" alt="Zenvoraa Logo" /></div>
 
         <div className="nav-links">
           <a href="#home">Home</a>
