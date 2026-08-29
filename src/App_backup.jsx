@@ -1,8 +1,7 @@
-﻿import Navbar from "./components/Navbar";
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const API_URL = "https://zenvoraa-backend.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 function App() {
@@ -32,16 +31,7 @@ const [enquiryMessage, setEnquiryMessage] = useState("");
 const [enquiryLoading, setEnquiryLoading] = useState(false);
 const [enquirySuccess, setEnquirySuccess] = useState("");
 // Login / Register
-const [showAuth, setShowAuth] = useState(() => {
-  return localStorage.getItem("openLogin") === "true";
-});
-
-useEffect(() => {
-  if (localStorage.getItem("openLogin") === "true") {
-    localStorage.removeItem("openLogin");
-    setShowAuth(true);
-  }
-}, []);
+const [showAuth, setShowAuth] = useState(false);
 const [authMode, setAuthMode] = useState("login");
 const [showDashboard, setShowDashboard] = useState(false);
 const [showSellProperty, setShowSellProperty] = useState(false);
@@ -87,7 +77,7 @@ useEffect(() => {
       setShowDashboard(false);
       setShowEnquiries(false);
 
-      alert("â° You have been logged out due to inactivity.");
+      alert("⏰ You have been logged out due to inactivity.");
     }, 15 * 60 * 1000);
   };
 
@@ -171,7 +161,7 @@ setServerError("");
   console.error("Error fetching properties:", error);
   setProperties([]);
   setServerError(
-    "âš ï¸ Server temporarily unavailable. Please try again."
+    "⚠️ Server temporarily unavailable. Please try again."
   );
 } finally {
   setLoading(false);
@@ -287,7 +277,7 @@ const handleSellProperty = async (e) => {
       );
     }
 
-    alert("  Property listed successfully!");
+    alert("🏠 Property listed successfully!");
 
     // Reset form
     setSellTitle("");
@@ -341,7 +331,7 @@ const handleSellProperty = async (e) => {
       throw new Error(data.detail || "Failed to create enquiry");
     }
 
-    setEnquirySuccess("Enquiry sent successfully! âœ…");
+    setEnquirySuccess("Enquiry sent successfully! ✅");
    
     setEnquiryMessage("");
   } catch (error) {
@@ -455,11 +445,11 @@ const updateProperty = async () => {
   if (!response.ok) {
   const errorText = await response.text();
   console.error("UPDATE API ERROR:", errorText);
-  alert("âŒ Update failed: " + errorText);
+  alert("❌ Update failed: " + errorText);
   return;
 }
 
-    alert("âœ… Property updated successfully!");
+    alert("✅ Property updated successfully!");
 
     setEditingProperty(null);
 
@@ -468,7 +458,7 @@ const updateProperty = async () => {
 
   } catch (error) {
     console.error("Update property error:", error);
-    alert(" Failed to update property");
+    alert("❌ Failed to update property");
   }
 };
 const deleteProperty = async (propertyId) => {
@@ -494,14 +484,14 @@ const deleteProperty = async (propertyId) => {
       throw new Error(data.message || "Failed to delete property");
     }
 
-    alert("🏠 Property deleted successfully!");
+    alert("🗑️ Property deleted successfully!");
 
     fetchMyProperties();
     fetchProperties("", "Buy");
 
   } catch (error) {
     console.error("Delete property error:", error);
-    alert("âŒ " + error.message);
+    alert("❌ " + error.message);
   }
 };
 const updateEnquiryStatus = async (enquiryId, status) => {
@@ -581,8 +571,7 @@ const handleAuth = async () => {
       }
 
       setLoggedCustomer(data.customer);
-      localStorage.setItem("loggedCustomer", JSON.stringify(data.customer));
-      setAuthMessage("Registration successful! âœ…");
+      setAuthMessage("Registration successful! ✅");
 
       setCustomerName("");
       setCustomerEmail("");
@@ -628,9 +617,8 @@ const handleAuth = async () => {
       }
 
       setLoggedCustomer(data.customer);
-      localStorage.setItem("loggedCustomer", JSON.stringify(data.customer));
       setShowAuth(false);
-      setAuthMessage("Login successful! âœ…");
+      setAuthMessage("Login successful! ✅");
 
       setCustomerEmail("");
       setCustomerPassword("");
@@ -652,19 +640,66 @@ const handleAuth = async () => {
 };
   return (
      <div className="app">
+
       {/* Navbar */}
-      <Navbar
-        loggedCustomer={loggedCustomer}
-        setShowDashboard={setShowDashboard}
-        fetchMyEnquiries={fetchMyEnquiries}
-        fetchMyProperties={fetchMyProperties}
-        setShowAdminEnquiries={setShowAdminEnquiries}
-        fetchAdminEnquiries={fetchAdminEnquiries}
-        setLoggedCustomer={setLoggedCustomer}
-        setAuthMessage={setAuthMessage}
-        setAuthMode={setAuthMode}
-        setShowAuth={setShowAuth}
-      />
+      <nav className="navbar">
+        <div className="logo"><img src="/zenvoraa-logo.png" alt="Zenvoraa Logo" /></div>
+
+        <div className="nav-links">
+          <a href="#home">Home</a>
+          <a href="#properties">Properties</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+    {loggedCustomer ? (
+  <>
+    <button
+      className="login-btn"
+      onClick={() => {
+        setShowDashboard(true);
+        fetchMyEnquiries();
+        fetchMyProperties();
+      }}
+    >
+      👤 Dashboard
+    </button>
+
+    <button
+      className="login-btn"
+      onClick={() => {
+        setShowAdminEnquiries(true);
+        fetchAdminEnquiries();
+      }}
+    >
+      🛠️ Admin Enquiries
+    </button>
+
+    <button
+      className="login-btn"
+      onClick={() => {
+        setLoggedCustomer(null);
+        setAuthMessage("");
+        setAuthMode("login");
+      }}
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <button
+    className="login-btn"
+    onClick={() => {
+      setAuthMode("login");
+      setAuthMessage("");
+      setShowAuth(true);
+    }}
+  >
+    Login
+  </button>
+)}
+      </nav>
+
 
       {/* Hero Section */}
       <section className="hero-section" id="home">
@@ -684,45 +719,75 @@ const handleAuth = async () => {
           </p>
 
 
-  <button
-    onClick={() => setShowSellProperty(true)}
-  >
-    🏡 List Your Property
-  </button>
+          {/* Search */}
+          <div className="search-box">
 
-</div>
-
-        <div className="hero-visual">
-
-          <div className="hero-image-card">
-            <img
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85"
-              alt="Modern home"
+            <input
+              type="text"
+              placeholder="Search by location..."
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
             />
+            <input
+  type="number"
+  placeholder="Min Price"
+  value={minPrice}
+  onChange={(e) => setMinPrice(e.target.value)}
+/>
 
-            <div className="hero-image-overlay">
-              <strong>🇮🇳 Properties Across India</strong>
-              <span>Find your perfect place anywhere in India</span>
-            </div>
-          </div>
+<input
+  type="number"
+  placeholder="Max Price"
+  value={maxPrice}
+  onChange={(e) => setMaxPrice(e.target.value)}
+/>
+<input
+  type="number"
+  placeholder="Bedrooms"
+  min="1"
+  value={bedrooms}
+  onChange={(e) => setBedrooms(e.target.value)}
+/>
+<input
+  type="number"
+  placeholder="Min Area (sqft)"
+  min="0"
+  value={minArea}
+  onChange={(e) => setMinArea(e.target.value)}
+/>
 
-          <div className="hero-floating-card hero-card-top">
-            <span>✓</span>
-            <div>
-              <strong>Verified Properties</strong>
-              <small>Trusted listings</small>
-            </div>
-          </div>
+            <select
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+            >
+              <option value="Buy">Buy</option>
+              <option value="Rent">Rent</option>
+              <option value="Sell">Sell</option>
+            </select>
 
-          <div className="hero-floating-card hero-card-bottom">
-            <span>🏡</span>
-            <div>
-              <strong>Multiple Cities</strong>
-              <small>Buy • Rent • Sell</small>
-            </div>
+            <button onClick={handleSearch}>
+              Search
+            </button>
+
           </div>
 
         </div>
+      <div className="sell-property-cta">
+
+  <h2>🏠 Want to Buy, Rent or Sell a Property?</h2>
+
+  <button
+    onClick={() => setShowSellProperty(true)}
+  >
+    🏠 List Your Property
+  </button>
+
+</div>
       </section>
 
 
@@ -731,20 +796,16 @@ const handleAuth = async () => {
         className="properties-section"
         id="properties"
       >
-
+🏠 Want to Buy, Rent or Sell a Property?
         <div className="section-heading">
 
-          <p>EXPLORE ZENVORAA</p>
+          <p>EXPLORE</p>
 
           <h2>
             {location
               ? `Properties in ${location}`
-              : "Discover Places You'll Love"}
+              : "Featured Properties"}
           </h2>
-          <p className="section-description">
-            From modern homes to comfortable apartments, discover properties
-            that match your lifestyle and budget.
-          </p>
 
         </div>
 
@@ -766,94 +827,89 @@ const handleAuth = async () => {
     {serverError}
   </div>
 
+) : properties.length === 0 ? (
+
+  <p className="loading">
+    No properties found.
+  </p>
+
 ) : (
 
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(2, 1fr)",
-      gap: "22px",
-      marginTop: "25px",
-    }}
-  >
+  <div className="property-grid">
+            {properties.map((property) => (
 
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85"
-        alt="Luxury Modern House"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>🏡 Family Luxury Home</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Spacious living for your family</p>
-      </div>
+              <div
+                className="property-card"
+                key={property.id}
+              >
+
+     <div className="property-image">
+  {property.image_url ? (
+    <img
+      src={property.image_url}
+      alt={property.title}
+      className="property-card-image"
+    />
+  ) : (
+    <div className="property-image-placeholder">
+      🏠
+      <span>Property Image</span>
     </div>
-
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85"
-        alt="Modern Villa"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>✨ Modern Luxury Villa</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Contemporary premium living</p>
-      </div>
-    </div>
-
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85"
-        alt="Premium House"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>🌿 Premium Family House</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Peaceful and elegant home</p>
-      </div>
-    </div>
-
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85"
-        alt="Luxury Home"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>🏠 Elegant Dream Home</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Designed for modern living</p>
-      </div>
-    </div>
-
-  </div>
+  )}
+</div>
 
 
+                <div className="property-info">
+
+                 <span className="property-tag">
+  {property.purpose === "rent" ? "FOR RENT" : "FOR SALE"}
+</span>
 
 
+                  <h3>
+                    {property.title}
+                  </h3>
+
+
+                  <p className="location">
+                    📍 {property.location}
+                  </p>
+
+
+                  <div className="property-details">
+
+                    <span>
+                      🛏 {property.bedrooms} Beds
+                    </span>
+
+                    <span>
+                      📐 {property.area} sqft
+                    </span>
+
+                  </div>
+
+
+                  <div className="property-bottom">
+
+                    <strong>
+                      ₹{Number(property.price).toLocaleString("en-IN")}
+                    </strong>
+
+                    <button
+                      onClick={() => setSelectedProperty(property)}
+                    >
+                      View Details
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
 
         )}
 
@@ -877,7 +933,7 @@ const handleAuth = async () => {
               className="modal-close"
               onClick={() => setSelectedProperty(null)}
             >
-              ❌
+              ×
             </button>
 
            <div className="modal-image">
@@ -889,7 +945,7 @@ const handleAuth = async () => {
     />
   ) : (
     <div className="modal-image-placeholder">
-       
+      🏠
       <span>Property Image</span>
     </div>
   )}
@@ -915,7 +971,7 @@ const handleAuth = async () => {
               <div className="modal-details">
 
   <div className="detail-item">
-    <span>🛏️</span>
+    <span>🛏</span>
     <strong>{selectedProperty.bedrooms}</strong>
     <small>Bedrooms</small>
   </div>
@@ -928,7 +984,7 @@ const handleAuth = async () => {
 
   {selectedProperty.bathrooms !== undefined && (
     <div className="detail-item">
-      <span>🏠</span>
+      <span>🚿</span>
       <strong>{selectedProperty.bathrooms}</strong>
       <small>Bathrooms</small>
     </div>
@@ -936,7 +992,7 @@ const handleAuth = async () => {
 
   {selectedProperty.floors !== undefined && (
     <div className="detail-item">
-      <span>¢</span>
+      <span>🏢</span>
       <strong>{selectedProperty.floors}</strong>
       <small>Floors</small>
     </div>
@@ -944,7 +1000,7 @@ const handleAuth = async () => {
 
 </div>
 <div className="property-description">
-  <h3>  Property Overview</h3>
+  <h3>🏠 Property Overview</h3>
 
   <p>
     {selectedProperty.description ||
@@ -998,7 +1054,7 @@ const handleAuth = async () => {
         className="modal-close"
         onClick={() => setShowAuth(false)}
       >
-        ❌
+        ×
       </button>
 
       <h2>
@@ -1065,8 +1121,8 @@ const handleAuth = async () => {
         {authLoading
           ? "Please wait..."
           : authMode === "login"
-          ? "🏠” Login"
-          : "🏠“ Register"}
+          ? "🔐 Login"
+          : "📝 Register"}
       </button>
 
       {authMessage && (
@@ -1124,19 +1180,19 @@ const handleAuth = async () => {
         className="modal-close"
         onClick={() => setShowDashboard(false)}
       >
-       ❌
+        ×
       </button>
 
-     <h2>🏠 My Dashboard</h2>
+     <h2>👤 My Dashboard</h2>
 
 <p className="dashboard-welcome">
-  Welcome, <strong>{loggedCustomer.name}</strong> 🏠‘‹
+  Welcome, <strong>{loggedCustomer.name}</strong> 👋
 </p>
 
 <div className="dashboard-profile">
 
   <div className="profile-title">
-    🏠‘¤ Profile Information
+    👤 Profile Information
   </div>
 
   <p>
@@ -1167,7 +1223,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="dashboard-stat">
-    <div className="stat-icon">🏠Ÿ¡</div>
+    <div className="stat-icon">🟡</div>
     <div>
       <h3>
         {
@@ -1182,7 +1238,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="dashboard-stat">
-    <div className="stat-icon">âœ…</div>
+    <div className="stat-icon">✅</div>
     <div>
       <h3>
         {
@@ -1198,12 +1254,12 @@ const handleAuth = async () => {
 
 </div>
 <h3 className="dashboard-enquiries-title">
-    My Properties
+  🏠 My Properties
 </h3>
 
 {myProperties.length === 0 ? (
   <div className="dashboard-empty">
-    <p>  No properties listed yet.</p>
+    <p>🏠 No properties listed yet.</p>
   </div>
 ) : (
   <div className="dashboard-enquiries">
@@ -1217,7 +1273,7 @@ const handleAuth = async () => {
         <div className="dashboard-enquiry-header">
 
           <strong>
-              {property.title}
+            🏠 {property.title}
           </strong>
 
           <span
@@ -1232,21 +1288,21 @@ const handleAuth = async () => {
     type="button"
     onClick={() => updatePropertyStatus(property.id, "available")}
   >
-    🏠Ÿ¢ Available
+    🟢 Available
   </button>
 
   <button
     type="button"
     onClick={() => updatePropertyStatus(property.id, "rented")}
   >
-    🏠Ÿ  Rented
+    🟠 Rented
   </button>
 
   <button
     type="button"
     onClick={() => updatePropertyStatus(property.id, "sold")}
   >
-    🏠”´ Sold
+    🔴 Sold
   </button>
 </div>
 
@@ -1257,11 +1313,11 @@ const handleAuth = async () => {
         </p>
 
         <p className="dashboard-property-price">
-          🏠’° ₹{Number(property.price).toLocaleString("en-IN")}
+          💰 ₹{Number(property.price).toLocaleString("en-IN")}
         </p>
 
         <p>
-          🛏️ {property.bedrooms} Beds
+          🛏 {property.bedrooms} Beds
           &nbsp;&nbsp;
           📐 {property.area} sqft
         </p>
@@ -1280,18 +1336,18 @@ const handleAuth = async () => {
 
 
 >
- 🏠 Edit Property
+  ✏️ Edit Property
 </button>
 <button
   className="login-btn"
   onClick={() => deleteProperty(property.id)}
 >
-  🏠 Delete Property
+  🗑️ Delete Property
 </button>
 {editingProperty && (
   <div className="dashboard-edit-form">
 
-    <h3>âœï¸ Edit Property</h3>
+    <h3>✏️ Edit Property</h3>
 
     <input
       type="text"
@@ -1340,14 +1396,14 @@ const handleAuth = async () => {
   className="login-btn"
   onClick={updateProperty}
 >
-  🏠 Save Changes
+  💾 Save Changes
 </button>
 
       <button
         className="login-btn"
         onClick={() => setEditingProperty(null)}
       >
-        âŒ Cancel
+        ❌ Cancel
       </button>
     </div>
 
@@ -1369,7 +1425,7 @@ const handleAuth = async () => {
   <p>Loading enquiries...</p>
 ) : myEnquiries.length === 0 ? (
   <div className="dashboard-empty">
-    <p>🏠­ No enquiries found.</p>
+    <p>📭 No enquiries found.</p>
   </div>
 ) : (
   <div className="dashboard-enquiries">
@@ -1385,7 +1441,7 @@ const handleAuth = async () => {
           <div className="dashboard-enquiry-header">
 
   <strong>
-     {enquiry.property_title || `Property #${enquiry.property_id}`}
+    🏠 {enquiry.property_title || `Property #${enquiry.property_id}`}
   </strong>
 
   <span
@@ -1403,7 +1459,7 @@ const handleAuth = async () => {
 </p>
 
 <p className="dashboard-property-price">
-  🏠{Number(enquiry.property_price).toLocaleString("en-IN")}
+  💰 ₹{Number(enquiry.property_price).toLocaleString("en-IN")}
 </p>
 
           <span
@@ -1417,12 +1473,12 @@ const handleAuth = async () => {
         </div>
 
         <div className="dashboard-message">
-          <strong>🏠 Message</strong>
+          <strong>💬 Message</strong>
           <p>{enquiry.message}</p>
         </div>
 
         <div className="dashboard-date">
-          🏠“…{" "}
+          📅{" "}
           {new Date(
             enquiry.created_at
           ).toLocaleDateString("en-IN")}
@@ -1451,10 +1507,10 @@ const handleAuth = async () => {
         className="modal-close"
         onClick={() => setShowAdminEnquiries(false)}
       >
-       ❌
+        ×
       </button>
 
-      <h2>🏠 Admin Enquiries</h2>
+      <h2>🛠️ Admin Enquiries</h2>
       <div className="admin-stats">
 
   <div className="admin-stat">
@@ -1466,7 +1522,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="admin-stat">
-    <span>🏠</span>
+    <span>🟡</span>
     <div>
       <strong>
         {adminEnquiries.filter(
@@ -1478,7 +1534,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="admin-stat">
-    <span>🏠</span>
+    <span>🔵</span>
     <div>
       <strong>
         {adminEnquiries.filter(
@@ -1490,7 +1546,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="admin-stat">
-    <span>🏠</span>
+    <span>🟢</span>
     <div>
       <strong>
         {adminEnquiries.filter(
@@ -1511,7 +1567,7 @@ const handleAuth = async () => {
         <p>Loading enquiries...</p>
       ) : adminEnquiries.length === 0 ? (
         <div className="no-enquiries">
-          <p>🏠 No enquiries found.</p>
+          <p>📭 No enquiries found.</p>
         </div>
       ) : (
         <div className="enquiries-grid">
@@ -1525,7 +1581,7 @@ const handleAuth = async () => {
               <div className="enquiry-top">
 
                 <strong>
-                    {enquiry.property_title || "Property"}
+                  🏠 {enquiry.property_title || "Property"}
                 </strong>
 
                 <span
@@ -1571,22 +1627,22 @@ const handleAuth = async () => {
               </p>
 
               <p className="dashboard-property-price">
-                🏠{Number(
+                💰 ₹{Number(
                   enquiry.property_price
                 ).toLocaleString("en-IN")}
               </p>
 
               <p>
-                🏠 Customer #{enquiry.customer_id}
+                👤 Customer #{enquiry.customer_id}
               </p>
 
               <div className="enquiry-message">
-                <strong>🏠 Message</strong>
+                <strong>💬 Message</strong>
                 <p>{enquiry.message}</p>
               </div>
 
               <div className="enquiry-date">
-                🏠“…{" "}
+                📅{" "}
                 {new Date(
                   enquiry.created_at
                 ).toLocaleDateString("en-IN")}
@@ -1616,10 +1672,10 @@ const handleAuth = async () => {
         className="modal-close"
         onClick={() => setShowSellProperty(false)}
       >
-        ❌
+        ×
       </button>
 
-     <h2></h2>
+     <h2>🏠 Want to Buy, Rent or Sell a Property?</h2>
 
       <p className="enquiries-welcome">
         Enter your property details
@@ -1679,7 +1735,7 @@ const handleAuth = async () => {
   <option value="sell">Sell</option>
 </select>
 <label className="sell-image-label">
-  🏠Property Image
+  🖼️ Property Image
 </label>
 
 <input
@@ -1704,7 +1760,7 @@ const handleAuth = async () => {
   className="login-submit"
   disabled={imageUploading}
 >
-  {imageUploading ? "Uploading Image..." : "  List Property"}
+  {imageUploading ? "Uploading Image..." : "🏠 List Property"}
 </button>
 
       </form>
@@ -1733,7 +1789,9 @@ const handleAuth = async () => {
         <div className="features">
 
           <div>
-            <h3>🏠 Find Properties</h3>
+            <h3>
+              🏠 Find Properties
+            </h3>
 
             <p>
               Explore properties according to your needs.
@@ -1743,7 +1801,7 @@ const handleAuth = async () => {
 
           <div>
             <h3>
-             🔍 Smart Search
+              🔍 Smart Search
             </h3>
 
             <p>
@@ -1768,7 +1826,7 @@ const handleAuth = async () => {
 
 
       {/* Footer */}
-
+      ```jsx
 <footer id="contact">
 
   <div className="footer-logo">
@@ -1798,6 +1856,7 @@ const handleAuth = async () => {
   </p>
 
 </footer>
+```
 
 
     </div>
@@ -1805,31 +1864,3 @@ const handleAuth = async () => {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,5 +1,4 @@
-﻿import Navbar from "./components/Navbar";
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import "./App.css";
 
 const API_URL = "https://zenvoraa-backend.onrender.com";
@@ -32,16 +31,7 @@ const [enquiryMessage, setEnquiryMessage] = useState("");
 const [enquiryLoading, setEnquiryLoading] = useState(false);
 const [enquirySuccess, setEnquirySuccess] = useState("");
 // Login / Register
-const [showAuth, setShowAuth] = useState(() => {
-  return localStorage.getItem("openLogin") === "true";
-});
-
-useEffect(() => {
-  if (localStorage.getItem("openLogin") === "true") {
-    localStorage.removeItem("openLogin");
-    setShowAuth(true);
-  }
-}, []);
+const [showAuth, setShowAuth] = useState(false);
 const [authMode, setAuthMode] = useState("login");
 const [showDashboard, setShowDashboard] = useState(false);
 const [showSellProperty, setShowSellProperty] = useState(false);
@@ -652,19 +642,66 @@ const handleAuth = async () => {
 };
   return (
      <div className="app">
+
       {/* Navbar */}
-      <Navbar
-        loggedCustomer={loggedCustomer}
-        setShowDashboard={setShowDashboard}
-        fetchMyEnquiries={fetchMyEnquiries}
-        fetchMyProperties={fetchMyProperties}
-        setShowAdminEnquiries={setShowAdminEnquiries}
-        fetchAdminEnquiries={fetchAdminEnquiries}
-        setLoggedCustomer={setLoggedCustomer}
-        setAuthMessage={setAuthMessage}
-        setAuthMode={setAuthMode}
-        setShowAuth={setShowAuth}
-      />
+      <nav className="navbar">
+        <div className="logo"><img src="/zenvoraa-logo.png" alt="Zenvoraa Logo" /></div>
+
+        <div className="nav-links">
+          <a href="/">Home</a>
+          <a href="/properties">Properties</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        </div>
+
+    {loggedCustomer ? (
+  <>
+    <button
+      className="login-btn"
+      onClick={() => {
+        setShowDashboard(true);
+        fetchMyEnquiries();
+        fetchMyProperties();
+      }}
+    >
+      🏠 Dashboard
+    </button>
+
+    <button
+      className="login-btn"
+      onClick={() => {
+        setShowAdminEnquiries(true);
+        fetchAdminEnquiries();
+      }}
+    >
+      🏠 Admin Enquiries
+    </button>
+
+    <button
+      className="login-btn"
+      onClick={() => {
+        setLoggedCustomer(null);
+        setAuthMessage("");
+        setAuthMode("login");
+      }}
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <button
+    className="login-btn"
+    onClick={() => {
+      setAuthMode("login");
+      setAuthMessage("");
+      setShowAuth(true);
+    }}
+  >
+    Login
+  </button>
+)}
+      </nav>
+
 
       {/* Hero Section */}
       <section className="hero-section" id="home">
@@ -684,6 +721,8 @@ const handleAuth = async () => {
           </p>
 
 
+  <h2></h2>
+
   <button
     onClick={() => setShowSellProperty(true)}
   >
@@ -691,38 +730,6 @@ const handleAuth = async () => {
   </button>
 
 </div>
-
-        <div className="hero-visual">
-
-          <div className="hero-image-card">
-            <img
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85"
-              alt="Modern home"
-            />
-
-            <div className="hero-image-overlay">
-              <strong>🇮🇳 Properties Across India</strong>
-              <span>Find your perfect place anywhere in India</span>
-            </div>
-          </div>
-
-          <div className="hero-floating-card hero-card-top">
-            <span>✓</span>
-            <div>
-              <strong>Verified Properties</strong>
-              <small>Trusted listings</small>
-            </div>
-          </div>
-
-          <div className="hero-floating-card hero-card-bottom">
-            <span>🏡</span>
-            <div>
-              <strong>Multiple Cities</strong>
-              <small>Buy • Rent • Sell</small>
-            </div>
-          </div>
-
-        </div>
       </section>
 
 
@@ -734,17 +741,13 @@ const handleAuth = async () => {
 
         <div className="section-heading">
 
-          <p>EXPLORE ZENVORAA</p>
+          <p>EXPLORE</p>
 
           <h2>
             {location
               ? `Properties in ${location}`
-              : "Discover Places You'll Love"}
+              : "Featured Properties"}
           </h2>
-          <p className="section-description">
-            From modern homes to comfortable apartments, discover properties
-            that match your lifestyle and budget.
-          </p>
 
         </div>
 
@@ -766,94 +769,89 @@ const handleAuth = async () => {
     {serverError}
   </div>
 
+) : properties.length === 0 ? (
+
+  <p className="loading">
+    No properties found.
+  </p>
+
 ) : (
 
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(2, 1fr)",
-      gap: "22px",
-      marginTop: "25px",
-    }}
-  >
+  <div className="property-grid">
+            {properties.map((property) => (
 
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85"
-        alt="Luxury Modern House"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>🏡 Family Luxury Home</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Spacious living for your family</p>
-      </div>
+              <div
+                className="property-card"
+                key={property.id}
+              >
+
+     <div className="property-image">
+  {property.image_url ? (
+    <img
+      src={property.image_url}
+      alt={property.title}
+      className="property-card-image"
+    />
+  ) : (
+    <div className="property-image-placeholder">
+       
+      <span>Property Image</span>
     </div>
-
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85"
-        alt="Modern Villa"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>✨ Modern Luxury Villa</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Contemporary premium living</p>
-      </div>
-    </div>
-
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85"
-        alt="Premium House"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>🌿 Premium Family House</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Peaceful and elegant home</p>
-      </div>
-    </div>
-
-    <div className="property-card">
-      <img
-        src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85"
-        alt="Luxury Home"
-        style={{
-          width: "100%",
-          height: "280px",
-          objectFit: "cover",
-          borderRadius: "18px 18px 0 0",
-          display: "block",
-        }}
-      />
-      <div style={{ padding: "16px 18px" }}>
-        <h3 style={{ margin: 0, color: "#111827" }}>🏠 Elegant Dream Home</h3>
-        <p style={{ margin: "7px 0 0", color: "#64748b" }}>Designed for modern living</p>
-      </div>
-    </div>
-
-  </div>
+  )}
+</div>
 
 
+                <div className="property-info">
+
+                 <span className="property-tag">
+  {property.purpose === "rent" ? "FOR RENT" : "FOR SALE"}
+</span>
 
 
+                  <h3>
+                    {property.title}
+                  </h3>
+
+
+                  <p className="location">
+                    📍 {property.location}
+                  </p>
+
+
+                  <div className="property-details">
+
+                    <span>
+                      🛏️ {property.bedrooms} Beds
+                    </span>
+
+                    <span>
+                      📐 {property.area} sqft
+                    </span>
+
+                  </div>
+
+
+                  <div className="property-bottom">
+
+                    <strong>
+                      ₹{Number(property.price).toLocaleString("en-IN")}
+                    </strong>
+
+                    <button
+                      onClick={() => setSelectedProperty(property)}
+                    >
+                      View Details
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
 
         )}
 
@@ -1805,25 +1803,6 @@ const handleAuth = async () => {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
