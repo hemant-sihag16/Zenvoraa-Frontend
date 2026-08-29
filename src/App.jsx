@@ -1130,13 +1130,13 @@ const handleAuth = async () => {
      <h2>🏠 My Dashboard</h2>
 
 <p className="dashboard-welcome">
-  Welcome, <strong>{loggedCustomer.name}</strong> 🏠‘‹
+  Welcome, <strong>{loggedCustomer.name}</strong> 🏠
 </p>
 
 <div className="dashboard-profile">
 
   <div className="profile-title">
-    🏠‘¤ Profile Information
+    🏠 Profile Information
   </div>
 
   <p>
@@ -1167,7 +1167,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="dashboard-stat">
-    <div className="stat-icon">🏠Ÿ¡</div>
+    <div className="stat-icon">🏠</div>
     <div>
       <h3>
         {
@@ -1182,7 +1182,7 @@ const handleAuth = async () => {
   </div>
 
   <div className="dashboard-stat">
-    <div className="stat-icon">âœ…</div>
+    <div className="stat-icon">🏠</div>
     <div>
       <h3>
         {
@@ -1198,12 +1198,12 @@ const handleAuth = async () => {
 
 </div>
 <h3 className="dashboard-enquiries-title">
-    My Properties
+  🏠 My Properties
 </h3>
 
 {myProperties.length === 0 ? (
   <div className="dashboard-empty">
-    <p>  No properties listed yet.</p>
+    <p>🏠 No properties listed yet.</p>
   </div>
 ) : (
   <div className="dashboard-enquiries">

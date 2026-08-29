@@ -19,6 +19,11 @@ function Properties() {
   const [enquiryMessage, setEnquiryMessage] = useState("");
   const [enquiryLoading, setEnquiryLoading] = useState(false);
 
+  const [loggedCustomer, setLoggedCustomer] = useState(() => {
+    const saved = localStorage.getItem("loggedCustomer");
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const fetchProperties = async () => {
     setLoading(true);
     setError("");
@@ -118,7 +123,18 @@ function Properties() {
 
   return (
     <>
-      <Navbar />
+      <Navbar
+        loggedCustomer={loggedCustomer}
+        setLoggedCustomer={setLoggedCustomer}
+        setAuthMessage={() => {}}
+        setAuthMode={() => {}}
+        setShowAuth={() => { localStorage.setItem("openLogin", "true"); window.location.href = "/"; }}
+        setShowDashboard={() => {}}
+        fetchMyEnquiries={() => {}}
+        fetchMyProperties={() => {}}
+        setShowAdminEnquiries={() => {}}
+        fetchAdminEnquiries={() => {}}
+      />
       <div className="properties-page">
       <div className="properties-container">
 
@@ -491,6 +507,9 @@ const closeButton = {
 };
 
 export default Properties;
+
+
+
 
 
 

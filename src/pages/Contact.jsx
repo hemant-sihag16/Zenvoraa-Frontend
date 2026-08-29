@@ -2,7 +2,17 @@
 function Contact() {
   return (
     <>
-      <Navbar />
+      <Navbar         loggedCustomer={(() => { const saved = localStorage.getItem("loggedCustomer"); return saved ? JSON.parse(saved) : null; })()}
+        setLoggedCustomer={(customer) => { if (customer) localStorage.setItem("loggedCustomer", JSON.stringify(customer)); else localStorage.removeItem("loggedCustomer"); window.location.href = "/"; }}
+        setAuthMessage={() => {}}
+        setAuthMode={() => {}}
+        setShowAuth={() => { localStorage.setItem("openLogin", "true"); window.location.href = "/"; }}
+        setShowDashboard={() => {}}
+        fetchMyEnquiries={() => {}}
+        fetchMyProperties={() => {}}
+        setShowAdminEnquiries={() => {}}
+        fetchAdminEnquiries={() => {}}
+      />
       <div
       style={{
         minHeight: "100vh",
@@ -121,5 +131,7 @@ function Contact() {
 }
 
 export default Contact;
+
+
 
 
