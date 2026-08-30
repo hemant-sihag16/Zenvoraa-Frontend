@@ -1125,6 +1125,30 @@ function App() {
                   {authLoading ? "Logging in..." : "🔑 Login"}
                 </button>
 
+                <div className="owner-quickfill-box" style={{ marginTop: "12px", textAlign: "center" }}>
+                  <button
+                    type="button"
+                    style={{
+                      background: "#fef3c7",
+                      border: "1px dashed #d97706",
+                      color: "#92400e",
+                      padding: "7px 12px",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      width: "100%"
+                    }}
+                    onClick={() => {
+                      setCustomerEmail("zenvoraa.support@gmail.com");
+                      setCustomerPassword("Sihag@95186");
+                      setAuthError("");
+                    }}
+                  >
+                    👑 Website Owner 1-Click Credentials Fill
+                  </button>
+                </div>
+
                 <div className="auth-footer-help">
                   <p>
                     Don't have an account?{" "}
