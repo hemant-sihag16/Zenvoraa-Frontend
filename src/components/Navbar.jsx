@@ -1,4 +1,6 @@
-﻿function Navbar({
+﻿import "./Navbar.css";
+
+function Navbar({
   loggedCustomer,
   setShowDashboard,
   fetchMyEnquiries,
