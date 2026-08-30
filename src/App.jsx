@@ -463,6 +463,11 @@ function App() {
       setShowAuth(false);
       setCustomerEmail("");
       setCustomerPassword("");
+
+      // Automatically open Website Owner Master Control Room screen on login
+      if (data.customer.role === "super_admin") {
+        setShowOwnerPortal(true);
+      }
     } catch (err) {
       if (err.message === "Failed to fetch") {
         setAuthError(`⚠️ Unable to connect to Zenvoraa API at ${API_URL}. If hosting backend locally, please ensure FastAPI backend is running.`);
@@ -1026,7 +1031,7 @@ function App() {
                       width: "100%"
                     }}
                     onClick={() => {
-                      setCustomerEmail("govindkasnia42@gmail.com");
+                      setCustomerEmail("zenvoraa.support@gmail.com");
                       setCustomerPassword("Sihag@95186");
                       setAuthError("");
                     }}
