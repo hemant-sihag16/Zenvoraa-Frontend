@@ -2,9 +2,14 @@ import Navbar from "../components/Navbar";
 import "./Properties.css";
 import { useEffect, useState } from "react";
 
-const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:8000"
-  : "https://zenvoraa-backend.onrender.com";
+const API_URL = (() => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1" || /^192\.168\.\d+\.\d+$/.test(host) || /^10\.\d+\.\d+\.\d+$/.test(host) || /^172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+$/.test(host)) {
+    return `http://${host}:8000`;
+  }
+  return "https://zenvoraa-backend.onrender.com";
+})();
 
 function Properties() {
   const [properties, setProperties] = useState([]);
@@ -36,6 +41,22 @@ function Properties() {
       return null;
     }
   });
+
+  // Read URL Search Parameters on initial page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialLoc = urlParams.get("location") || "";
+    const initialPurp = urlParams.get("purpose") || "";
+    const initialMin = urlParams.get("min_price") || "";
+    const initialMax = urlParams.get("max_price") || "";
+    const initialBeds = urlParams.get("bedrooms") || "";
+
+    if (initialLoc) setLocation(initialLoc);
+    if (initialPurp) setPurpose(initialPurp);
+    if (initialMin) setMinPrice(initialMin);
+    if (initialMax) setMaxPrice(initialMax);
+    if (initialBeds) setBedrooms(initialBeds);
+  }, []);
 
   const fetchProperties = async () => {
     setLoading(true);

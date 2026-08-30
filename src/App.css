@@ -2769,3 +2769,131 @@ footer p {
   font-size: 13px;
 }
 
+/* ======================================================== */
+/* COMPREHENSIVE MOBILE RESPONSIVE STYLES                   */
+/* ======================================================== */
+@media (max-width: 768px) {
+  /* Prevent horizontal overflow */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    padding: 10px !important;
+    align-items: flex-end !important;
+  }
+
+  .auth-modal,
+  .owner-portal-modal,
+  .dashboard-modal,
+  .certificate-modal,
+  .property-detail-modal {
+    padding: 20px 16px !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 92vh !important;
+    width: 100% !important;
+  }
+
+  /* Forms & Rows */
+  .form-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px !important; /* Prevents auto-zoom on mobile browsers */
+  }
+
+  /* Hero Section */
+  .hero-section {
+    padding: 40px 16px !important;
+    min-height: auto !important;
+  }
+
+  .hero-content h1 {
+    font-size: 32px !important;
+    letter-spacing: -1px !important;
+  }
+
+  .hero-text {
+    font-size: 15px !important;
+    margin: 16px 0 !important;
+  }
+
+  .hero-action-box {
+    padding: 12px !important;
+  }
+
+  .hero-search-row,
+  .hero-verify-bar {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .hero-input,
+  .hero-select,
+  .verify-bar-input {
+    width: 100% !important;
+    font-size: 16px !important;
+  }
+
+  .hero-search-btn,
+  .verify-bar-btn,
+  .list-prop-btn,
+  .map-view-btn {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+
+  .hero-cta-group {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Filter toolbar */
+  .filter-toolbar {
+    padding: 20px 16px !important;
+  }
+
+  .filter-container {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .filter-item {
+    width: 100% !important;
+  }
+
+  .filter-item input,
+  .filter-item select {
+    width: 100% !important;
+    font-size: 16px !important;
+  }
+
+  .apply-filter-btn {
+    width: 100% !important;
+    padding: 12px !important;
+  }
+
+  /* Property Grid */
+  .properties-section {
+    padding: 40px 16px !important;
+  }
+
+  .properties-grid,
+  .property-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Table overflow */
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+

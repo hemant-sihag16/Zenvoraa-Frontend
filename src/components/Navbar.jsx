@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./Navbar.css";
 
 function Navbar({
@@ -16,36 +17,55 @@ function Navbar({
   setAuthMode,
   setShowAuth,
 }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const role = loggedCustomer?.role || "guest";
+
+  const closeMenu = () => setMobileMenuOpen(false);
 
   return (
     <nav className="navbar">
-      <div className="logo" onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }}>
-        <img src="/zenvoraa-logo.png" alt="Zenvoraa Logo" />
+      <div className="nav-top-row">
+        <div className="logo" onClick={() => { closeMenu(); window.location.href = "/"; }} style={{ cursor: "pointer" }}>
+          <img src="/zenvoraa-logo.png" alt="Zenvoraa Logo" />
+        </div>
+
+        <button
+          className="mobile-toggle-btn"
+          onClick={() => setMobileMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation menu"
+        >
+          {mobileMenuOpen ? "✕" : "☰"}
+        </button>
       </div>
 
-      <div className="nav-links">
-        <a href="/">Home</a>
-        <a href="/properties">Properties</a>
+      <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
+        <a href="/" onClick={closeMenu}>Home</a>
+        <a href="/properties" onClick={closeMenu}>Properties</a>
         <button
           type="button"
           className="nav-link-btn"
-          onClick={() => setShowVerifyModal && setShowVerifyModal(true)}
+          onClick={() => {
+            closeMenu();
+            if (setShowVerifyModal) setShowVerifyModal(true);
+          }}
         >
           🔍 Verify Property
         </button>
         <button
           type="button"
           className="nav-link-btn"
-          onClick={() => setShowMapModal && setShowMapModal(true)}
+          onClick={() => {
+            closeMenu();
+            if (setShowMapModal) setShowMapModal(true);
+          }}
         >
           🗺️ Geo Map
         </button>
-        <a href="/about">About</a>
-        <a href="/contact">Contact</a>
+        <a href="/about" onClick={closeMenu}>About</a>
+        <a href="/contact" onClick={closeMenu}>Contact</a>
       </div>
 
-      <div className="navbar-actions">
+      <div className={`navbar-actions ${mobileMenuOpen ? "open" : ""}`}>
         {loggedCustomer ? (
           <div className="user-action-group">
             {/* 1. SUPER ADMIN / WEBSITE OWNER */}
@@ -54,6 +74,7 @@ function Navbar({
                 <button
                   className="owner-action-btn"
                   onClick={() => {
+                    closeMenu();
                     if (setShowOwnerPortal) setShowOwnerPortal(true);
                   }}
                   title="Super Admin Complete Control Room"
@@ -63,6 +84,7 @@ function Navbar({
                 <button
                   className="login-btn"
                   onClick={() => {
+                    closeMenu();
                     if (setShowAdminEnquiries) setShowAdminEnquiries(true);
                     if (fetchAdminEnquiries) fetchAdminEnquiries();
                   }}
@@ -78,6 +100,7 @@ function Navbar({
                 <button
                   className="admin-action-btn"
                   onClick={() => {
+                    closeMenu();
                     if (setShowAdminEnquiries) setShowAdminEnquiries(true);
                     if (fetchAdminEnquiries) fetchAdminEnquiries();
                   }}
@@ -93,6 +116,7 @@ function Navbar({
                 <button
                   className="seller-action-btn"
                   onClick={() => {
+                    closeMenu();
                     if (setShowSellProperty) setShowSellProperty(true);
                   }}
                 >
@@ -101,6 +125,7 @@ function Navbar({
                 <button
                   className="login-btn"
                   onClick={() => {
+                    closeMenu();
                     if (setShowDashboard) setShowDashboard(true);
                     if (fetchMyProperties) fetchMyProperties();
                     if (fetchMyEnquiries) fetchMyEnquiries();
@@ -116,6 +141,7 @@ function Navbar({
               <button
                 className="login-btn"
                 onClick={() => {
+                  closeMenu();
                   if (setShowDashboard) setShowDashboard(true);
                   if (fetchMyEnquiries) fetchMyEnquiries();
                 }}
@@ -141,6 +167,7 @@ function Navbar({
             <button
               className="logout-btn"
               onClick={() => {
+                closeMenu();
                 setLoggedCustomer(null);
                 localStorage.removeItem("loggedCustomer");
                 if (setAuthMessage) setAuthMessage("");
@@ -156,6 +183,7 @@ function Navbar({
             <button
               className="login-btn"
               onClick={() => {
+                closeMenu();
                 if (setAuthMode) setAuthMode("login");
                 if (setAuthMessage) setAuthMessage("");
                 if (setShowAuth) setShowAuth(true);
@@ -171,4 +199,3 @@ function Navbar({
 }
 
 export default Navbar;
-

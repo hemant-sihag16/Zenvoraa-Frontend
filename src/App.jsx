@@ -2,10 +2,15 @@ import { useEffect, useState, useMemo } from "react";
 import Navbar from "./components/Navbar";
 import "./App.css";
 
-// Backend API configuration with localhost and production fallback
-const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:8000"
-  : "https://zenvoraa-backend.onrender.com";
+// Backend API configuration with environment, local IP, and production fallback
+const API_URL = (() => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1" || /^192\.168\.\d+\.\d+$/.test(host) || /^10\.\d+\.\d+\.\d+$/.test(host) || /^172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+$/.test(host)) {
+    return `http://${host}:8000`;
+  }
+  return "https://zenvoraa-backend.onrender.com";
+})();
 
 function App() {
   // Properties state
@@ -103,7 +108,7 @@ function App() {
   const [sellDescription, setSellDescription] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
 
-  // Sync logged customer to localStorage
+  // Sync logged customer to localStorage & check openLogin flag
   useEffect(() => {
     if (loggedCustomer) {
       localStorage.setItem("loggedCustomer", JSON.stringify(loggedCustomer));
@@ -111,6 +116,13 @@ function App() {
       localStorage.removeItem("loggedCustomer");
     }
   }, [loggedCustomer]);
+
+  useEffect(() => {
+    if (localStorage.getItem("openLogin") === "true") {
+      localStorage.removeItem("openLogin");
+      setShowAuth(true);
+    }
+  }, []);
 
   // OTP Countdown Timer
   useEffect(() => {
@@ -452,7 +464,11 @@ function App() {
       setCustomerEmail("");
       setCustomerPassword("");
     } catch (err) {
-      setAuthError(err.message);
+      if (err.message === "Failed to fetch") {
+        setAuthError(`⚠️ Unable to connect to Zenvoraa API at ${API_URL}. If hosting backend locally, please ensure FastAPI backend is running.`);
+      } else {
+        setAuthError(err.message);
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -787,9 +803,14 @@ function App() {
               </select>
               <button
                 className="hero-search-btn"
-                onClick={fetchProperties}
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  if (searchLocation.trim()) params.append("location", searchLocation.trim());
+                  if (searchPurpose) params.append("purpose", searchPurpose.toLowerCase());
+                  window.location.href = `/properties${params.toString() ? `?${params.toString()}` : ""}`;
+                }}
               >
-                🔍 Search
+                🔍 Search Properties
               </button>
             </div>
 
@@ -854,166 +875,31 @@ function App() {
         </div>
       </section>
 
-      {/* Filter Toolbar */}
-      <section className="filter-toolbar">
-        <div className="filter-container">
-          <div className="filter-item">
-            <label>City / Location</label>
-            <input
-              type="text"
-              placeholder="e.g. Jaipur, Mansarovar"
-              value={searchLocation}
-              onChange={(e) => setSearchLocation(e.target.value)}
-            />
-          </div>
-
-          <div className="filter-item">
-            <label>Min Price (₹)</label>
-            <input
-              type="number"
-              placeholder="Min"
-              value={searchMinPrice}
-              onChange={(e) => setSearchMinPrice(e.target.value)}
-            />
-          </div>
-
-          <div className="filter-item">
-            <label>Max Price (₹)</label>
-            <input
-              type="number"
-              placeholder="Max"
-              value={searchMaxPrice}
-              onChange={(e) => setSearchMaxPrice(e.target.value)}
-            />
-          </div>
-
-          <div className="filter-item">
-            <label>Bedrooms</label>
-            <select
-              value={searchBedrooms}
-              onChange={(e) => setSearchBedrooms(e.target.value)}
-            >
-              <option value="">Any BHK</option>
-              <option value="1">1 BHK</option>
-              <option value="2">2 BHK</option>
-              <option value="3">3 BHK</option>
-              <option value="4">4+ BHK</option>
-            </select>
-          </div>
-
-          <div className="filter-item filter-checkbox">
-            <label>
-              <input
-                type="checkbox"
-                checked={verifiedFilterOnly}
-                onChange={(e) => setVerifiedFilterOnly(e.target.checked)}
-              />
-              <span>✅ Verified Only</span>
-            </label>
-          </div>
-
-          <div className="filter-actions">
-            <button className="apply-filter-btn" onClick={fetchProperties}>
-              Apply Filters
-            </button>
-          </div>
+      {/* Explore Properties Banner - Directing to /properties Page */}
+      <section className="explore-properties-cta" style={{ background: "#ffffff", padding: "50px 7%", textAlign: "center", borderBottom: "1px solid #e2e8f0" }}>
+        <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+          <span style={{ color: "#d97706", fontWeight: "800", fontSize: "12px", letterSpacing: "2px" }}>EXPLORE ALL LISTINGS</span>
+          <h2 style={{ fontSize: "32px", margin: "10px 0", color: "#0f172a" }}>Find Your Next Verified Property</h2>
+          <p style={{ color: "#64748b", fontSize: "16px", marginBottom: "25px", lineHeight: "1.6" }}>
+            Search and filter available properties by city, price range, bedrooms, and verified legal ownership certificates on our dedicated Properties page.
+          </p>
+          <a
+            href="/properties"
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(135deg, #0f172a, #1e293b)",
+              color: "#fbbf24",
+              padding: "14px 28px",
+              borderRadius: "10px",
+              fontWeight: "700",
+              fontSize: "16px",
+              textDecoration: "none",
+              boxShadow: "0 4px 15px rgba(15, 23, 42, 0.2)"
+            }}
+          >
+            🏠 Go to Properties Page →
+          </a>
         </div>
-      </section>
-
-      {/* Properties Listing Grid */}
-      <section className="properties-section" id="properties">
-        <div className="section-header">
-          <div className="section-title-wrap">
-            <h2>Featured Properties</h2>
-            <p>Explore authenticated real estate listings with transparent verified ownership details.</p>
-          </div>
-          <div className="properties-count-badge">
-            {properties.length} Properties Available
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading properties...</p>
-          </div>
-        ) : properties.length === 0 ? (
-          <div className="empty-state">
-            <h3>🏠 No properties found</h3>
-            <p>Try adjusting your search filters or clear location search.</p>
-            <button className="btn-secondary" onClick={() => {
-              setSearchLocation("");
-              setSearchMinPrice("");
-              setSearchMaxPrice("");
-              setSearchBedrooms("");
-              setVerifiedFilterOnly(false);
-              fetchProperties();
-            }}>
-              Reset All Filters
-            </button>
-          </div>
-        ) : (
-          <div className="properties-grid">
-            {properties.map((property) => (
-              <div
-                className="property-card"
-                key={property.id}
-                onClick={() => setSelectedProperty(property)}
-              >
-                <div className="property-image-wrap">
-                  <img
-                    src={property.image_url || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85"}
-                    alt={property.title}
-                    loading="lazy"
-                  />
-                  <div className="card-top-badges">
-                    <span className={`purpose-pill ${property.purpose}`}>
-                      FOR {property.purpose?.toUpperCase()}
-                    </span>
-
-                    {property.is_verified ? (
-                      <span className="verified-card-pill" title="Officially Verified by Zenvoraa Legal Team">
-                        ✅ Verified by Zenvoraa
-                      </span>
-                    ) : (
-                      <span className="unverified-card-pill">
-                        ⏳ {property.verification_status === "pending" ? "Review Pending" : "Unverified"}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="property-price-tag">
-                    ₹{Number(property.price).toLocaleString("en-IN")}
-                  </div>
-                </div>
-
-                <div className="property-card-body">
-                  <h3 className="property-title">{property.title}</h3>
-                  <p className="property-location">📍 {property.location}</p>
-
-                  <div className="property-features">
-                    <span>🛏️ {property.bedrooms} BHK</span>
-                    <span>📐 {property.area} sqft</span>
-                    <span>📍 {property.city || "Jaipur"}</span>
-                  </div>
-
-                  {property.is_verified && property.owner_legal_name && (
-                    <div className="card-verified-owner">
-                      <small>Registered Owner:</small>
-                      <strong>{property.owner_legal_name}</strong>
-                    </div>
-                  )}
-
-                  <div className="property-card-footer">
-                    <button className="view-details-btn">
-                      View Details & Inquire →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Interactive Map Preview Section */}
@@ -1140,7 +1026,7 @@ function App() {
                       width: "100%"
                     }}
                     onClick={() => {
-                      setCustomerEmail("zenvoraa.support@gmail.com");
+                      setCustomerEmail("govindkasnia42@gmail.com");
                       setCustomerPassword("Sihag@95186");
                       setAuthError("");
                     }}
