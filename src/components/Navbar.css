@@ -1,4 +1,4 @@
-﻿.navbar {
+.navbar {
   width: 100%;
   min-height: 72px;
   display: flex !important;
@@ -8,19 +8,22 @@
   gap: 20px;
   padding: 10px 30px;
   box-sizing: border-box;
-  background: #111827 !important;
+  background: #0f172a !important;
   color: white;
   position: relative;
   z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .logo {
   flex: 0 0 auto;
   display: block !important;
+  cursor: pointer;
 }
 
 .logo img {
-  height: 48px;
+  height: 46px;
   width: auto;
   max-width: 180px;
   display: block;
@@ -31,7 +34,7 @@
   flex-direction: row !important;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: 22px;
   flex: 1;
 }
 
@@ -39,14 +42,34 @@
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  color: white !important;
+  color: #cbd5e1 !important;
   text-decoration: none;
   font-weight: 600;
+  font-size: 15px;
   white-space: nowrap;
+  transition: color 0.2s ease;
 }
 
 .nav-links a:hover {
-  color: #c6a15a !important;
+  color: #fbbf24 !important;
+}
+
+.nav-link-btn {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-link-btn:hover {
+  color: #60a5fa;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .navbar-actions {
@@ -54,99 +77,170 @@
   flex-direction: row !important;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   flex: 0 0 auto;
 }
 
+.user-action-group,
+.guest-action-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .login-btn {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  border: 1px solid #c6a15a;
-  background: transparent;
-  color: #c6a15a;
-  padding: 9px 16px;
+  border: 1px solid #d97706;
+  background: rgba(217, 119, 6, 0.1);
+  color: #fbbf24;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 700;
+  font-size: 14px;
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .login-btn:hover {
-  background: #c6a15a;
-  color: #111827;
+  background: #d97706;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.4);
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
+.owner-action-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0f172a;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+  transition: all 0.2s ease;
+}
+
+.owner-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
+}
+
+.admin-action-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-action-btn:hover {
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.seller-action-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-action-btn:hover {
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.role-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.role-super_admin {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.role-admin {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.role-house_owner {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.role-customer {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.logout-btn {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 900px) {
   .navbar {
-    width: 100%;
-    min-height: 115px;
-    display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
-    justify-content: flex-start !important;
-    padding: 6px 10px 0 !important;
-    gap: 0 !important;
-    box-sizing: border-box;
-    overflow: visible !important;
-  }
-
-  .logo {
-    width: 100%;
-    height: 58px;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-  }
-
-  .logo img {
-    height: 48px !important;
-    width: auto !important;
-    display: block !important;
-  }
-
-  .navbar-actions {
-    position: absolute !important;
-    top: 14px !important;
-    right: 10px !important;
-    width: auto !important;
-    display: flex !important;
-    align-items: center !important;
-  }
-
-  .login-btn {
-    font-size: 12px !important;
-    padding: 8px 15px !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
+    padding: 10px 15px !important;
+    gap: 10px;
   }
 
   .nav-links {
-    width: 100% !important;
-    height: 48px;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    flex-wrap: nowrap !important;
-    gap: 0 !important;
-    padding: 0 3px !important;
-    margin: 0 !important;
-    box-sizing: border-box;
-    border-top: 1px solid rgba(255,255,255,0.18);
-    border-bottom: 2px solid #c6a15a;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  .nav-links a {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: white !important;
-    font-size: 12px !important;
-    font-weight: 700 !important;
-    padding: 7px 4px !important;
-    white-space: nowrap !important;
-    text-decoration: none !important;
+  .navbar-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .user-profile-badge {
+    padding: 4px 8px;
   }
 }
+
 

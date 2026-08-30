@@ -1,8 +1,10 @@
-﻿import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar";
 import "./Properties.css";
 import { useEffect, useState } from "react";
 
-const API_URL = "https://zenvoraa-backend.onrender.com";
+const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? "http://localhost:8000"
+  : "https://zenvoraa-backend.onrender.com";
 
 function Properties() {
   const [properties, setProperties] = useState([]);
@@ -14,14 +16,25 @@ function Properties() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [bedrooms, setBedrooms] = useState("");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [enquiryMessage, setEnquiryMessage] = useState("");
   const [enquiryLoading, setEnquiryLoading] = useState(false);
 
+  // Authenticity Check
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifySearchQuery, setVerifySearchQuery] = useState("");
+  const [verifySearchResult, setVerifySearchResult] = useState(null);
+  const [verifySearchLoading, setVerifySearchLoading] = useState(false);
+
   const [loggedCustomer, setLoggedCustomer] = useState(() => {
-    const saved = localStorage.getItem("loggedCustomer");
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem("loggedCustomer");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
   });
 
   const fetchProperties = async () => {
@@ -36,6 +49,7 @@ function Properties() {
       if (minPrice) params.append("min_price", minPrice);
       if (maxPrice) params.append("max_price", maxPrice);
       if (bedrooms) params.append("bedrooms", bedrooms);
+      if (verifiedOnly) params.append("verified_only", "true");
 
       const query = params.toString();
       const url = `${API_URL}/properties${query ? `?${query}` : ""}`;
@@ -59,7 +73,7 @@ function Properties() {
 
   useEffect(() => {
     fetchProperties();
-  }, []);
+  }, [verifiedOnly]);
 
   const resetFilters = () => {
     setLocation("");
@@ -67,6 +81,7 @@ function Properties() {
     setMinPrice("");
     setMaxPrice("");
     setBedrooms("");
+    setVerifiedOnly(false);
 
     setTimeout(() => {
       fetchProperties();
@@ -74,12 +89,10 @@ function Properties() {
   };
 
   const handleEnquiry = async () => {
-    const loggedCustomer = JSON.parse(
-      localStorage.getItem("loggedCustomer")
-    );
-
     if (!loggedCustomer) {
       alert("Please login before sending an enquiry.");
+      localStorage.setItem("openLogin", "true");
+      window.location.href = "/";
       return;
     }
 
@@ -100,6 +113,7 @@ function Properties() {
           customer_id: loggedCustomer.id,
           property_id: selectedProperty.id,
           message: enquiryMessage,
+          customer_location: loggedCustomer.city || loggedCustomer.location || "Online Browser",
         }),
       });
 
@@ -109,7 +123,7 @@ function Properties() {
         throw new Error(data.detail || "Failed to create enquiry");
       }
 
-      alert("📩 Enquiry sent successfully!");
+      alert("📩 Enquiry sent successfully! The admin and owner have been notified.");
 
       setEnquiryMessage("");
       setSelectedProperty(null);
@@ -121,6 +135,25 @@ function Properties() {
     }
   };
 
+  const handleCheckAuthenticity = async (e) => {
+    e.preventDefault();
+    if (!verifySearchQuery.trim()) return;
+
+    setVerifySearchLoading(true);
+    setVerifySearchResult(null);
+
+    try {
+      const res = await fetch(`${API_URL}/properties/verify-check/${encodeURIComponent(verifySearchQuery.trim())}`);
+      const data = await res.json();
+      setVerifySearchResult(data);
+    } catch (err) {
+      console.error("Auth check err:", err);
+      setVerifySearchResult({ found: false, message: "Unable to connect to verification server." });
+    } finally {
+      setVerifySearchLoading(false);
+    }
+  };
+
   return (
     <>
       <Navbar
@@ -129,10 +162,10 @@ function Properties() {
         setAuthMessage={() => {}}
         setAuthMode={() => {}}
         setShowAuth={() => { localStorage.setItem("openLogin", "true"); window.location.href = "/"; }}
-        setShowDashboard={() => {}}
+        setShowDashboard={() => { window.location.href = "/"; }}
         fetchMyEnquiries={() => {}}
         fetchMyProperties={() => {}}
-        setShowAdminEnquiries={() => {}}
+        setShowAdminEnquiries={() => { window.location.href = "/"; }}
         fetchAdminEnquiries={() => {}}
       />
       <div className="properties-page">
@@ -144,8 +177,26 @@ function Properties() {
           </h1>
 
           <p style={{ color: "#4b5563", fontSize: "17px" }}>
-            Find your perfect property with Zenvoraa.
+            Find authentic, 100% verified properties with registered ownership title checks.
           </p>
+          
+          <div style={{ marginTop: "15px" }}>
+            <button
+              onClick={() => setShowVerifyModal(true)}
+              style={{
+                background: "linear-gradient(135deg, #10b981, #059669)",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              🔍 Check Property Authenticity Certificate
+            </button>
+          </div>
         </div>
 
         <div
@@ -170,7 +221,7 @@ function Properties() {
           >
             <input
               type="text"
-              placeholder="📍 Location"
+              placeholder="📍 Location / City"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               style={inputStyle}
@@ -220,23 +271,46 @@ function Properties() {
           <div
             style={{
               display: "flex",
-              gap: "12px",
-              marginTop: "15px",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "18px",
               flexWrap: "wrap",
+              gap: "12px",
             }}
           >
-            <button onClick={fetchProperties} style={searchButton}>
-              🔍 Search
-            </button>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "#34d399",
+                fontWeight: "bold",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={verifiedOnly}
+                onChange={(e) => setVerifiedOnly(e.target.checked)}
+              />
+              ✅ Show Only Verified Properties
+            </label>
 
-            <button onClick={resetFilters} style={resetButton}>
-              ↻ Reset
-            </button>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={fetchProperties} style={searchButton}>
+                🔍 Search
+              </button>
+
+              <button onClick={resetFilters} style={resetButton}>
+                ↻ Reset
+              </button>
+            </div>
           </div>
         </div>
 
         <h2 style={{ marginBottom: "20px", color: "#111827" }}>
-          🏡 Available Properties
+          🏡 Available Properties ({properties.length})
         </h2>
 
         {loading && (
@@ -261,30 +335,64 @@ function Properties() {
             }}
           >
             <h2>🏠 No Properties Found</h2>
-            <p>Try changing your search filters.</p>
+            <p>Try changing your search filters or clear verified-only toggle.</p>
           </div>
         )}
 
         <div className="property-grid">
           {properties.map((property) => (
             <div key={property.id} className="premium-property-card">
-
-              {property.image_url && (
-                <img
-                  src={property.image_url}
-                  alt={property.title}
-                  className="premium-property-image"
-                  style={{
-                    width: "100%",
-                    height: "210px",
-                    objectFit: "cover",
-                    borderRadius: "12px 12px 0 0",
-                  }}
-                />
-              )}
+              <div style={{ position: "relative" }}>
+                {property.image_url && (
+                  <img
+                    src={property.image_url}
+                    alt={property.title}
+                    className="premium-property-image"
+                    style={{
+                      width: "100%",
+                      height: "210px",
+                      objectFit: "cover",
+                      borderRadius: "12px 12px 0 0",
+                    }}
+                  />
+                )}
+                {property.is_verified ? (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "#10b981",
+                      color: "white",
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      fontSize: "11px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    ✅ Verified Title
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "rgba(100, 116, 139, 0.85)",
+                      color: "white",
+                      padding: "4px 8px",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      fontSize: "11px",
+                    }}
+                  >
+                    ⏳ Unverified
+                  </span>
+                )}
+              </div>
 
               <div className="property-card-body">
-
                 <span
                   style={{
                     display: "inline-block",
@@ -308,13 +416,19 @@ function Properties() {
                   {property.title}
                 </h2>
 
-                <p className="property-location">📍 {property.location}</p>
+                <p className="property-location">📍 {property.location} {property.city ? `(${property.city})` : ""}</p>
 
                 <p>
                   🛏️ {property.bedrooms || 0} Beds
                   &nbsp;&nbsp;
                   📐 {property.area || 0} sqft
                 </p>
+
+                {property.is_verified && property.owner_legal_name && (
+                  <p style={{ fontSize: "12px", color: "#166534", margin: "4px 0" }}>
+                    👤 Legal Owner: <strong>{property.owner_legal_name}</strong>
+                  </p>
+                )}
 
                 <h2 className="property-price" style={{ margin: "15px 0" }}>
                   ₹{Number(property.price || 0).toLocaleString("en-IN")}
@@ -324,7 +438,7 @@ function Properties() {
                   onClick={() => setSelectedProperty(property)}
                   style={detailsButton}
                 >
-                  👁️ View Details
+                  👁️ View Details & Verify
                 </button>
               </div>
             </div>
@@ -334,8 +448,8 @@ function Properties() {
 
       {/* VIEW DETAILS MODAL */}
       {selectedProperty && (
-        <div style={overlayStyle}>
-          <div style={modalStyle}>
+        <div style={overlayStyle} onClick={() => setSelectedProperty(null)}>
+          <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
 
             <button
               onClick={() => setSelectedProperty(null)}
@@ -356,32 +470,48 @@ function Properties() {
                 }}
               />
             )}
+            
+            <div style={{ marginTop: "15px" }}>
+              {selectedProperty.is_verified ? (
+                <span style={{ background: "#10b981", color: "white", padding: "4px 10px", borderRadius: "6px", fontWeight: "bold", fontSize: "12px" }}>
+                  ✅ Officially Verified Ownership
+                </span>
+              ) : (
+                <span style={{ background: "#64748b", color: "white", padding: "4px 10px", borderRadius: "6px", fontWeight: "bold", fontSize: "12px" }}>
+                  ⏳ Title Verification Pending
+                </span>
+              )}
+            </div>
 
             <h2>{selectedProperty.title}</h2>
 
             <p>📍 {selectedProperty.location}</p>
 
-            <p>🛏️ {selectedProperty.bedrooms || 0} Bedrooms</p>
-
-            <p>📐 {selectedProperty.area || 0} sqft</p>
+            <p>🛏️ {selectedProperty.bedrooms || 0} Bedrooms &nbsp;|&nbsp; 📐 {selectedProperty.area || 0} sqft</p>
 
             <h2>
               ₹{Number(selectedProperty.price || 0).toLocaleString("en-IN")}
             </h2>
 
             <p>
-              🏷️{" "}
-              {selectedProperty.purpose === "rent"
-                ? "For Rent"
-                : "For Sale"}
+              🏷️ {selectedProperty.purpose === "rent" ? "For Rent" : "For Sale"}
             </p>
+
+            {selectedProperty.is_verified && (
+              <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "12px", borderRadius: "8px", margin: "14px 0", color: "#166534" }}>
+                <h4 style={{ margin: "0 0 6px" }}>🛡️ Official Legal Verification</h4>
+                <p style={{ margin: "2px 0" }}><strong>Registered Legal Owner:</strong> {selectedProperty.owner_legal_name}</p>
+                <p style={{ margin: "2px 0" }}><strong>Registry Deed Number:</strong> {selectedProperty.registry_number}</p>
+                <p style={{ margin: "2px 0", fontSize: "12px" }}><small>Verified by Zenvoraa Legal Verification Desk.</small></p>
+              </div>
+            )}
 
             <hr />
 
-            <h3>📩 Send Enquiry</h3>
+            <h3>📩 Send Direct Enquiry</h3>
 
             <textarea
-              placeholder="Write your enquiry..."
+              placeholder="Write your enquiry message or request a site visit..."
               value={enquiryMessage}
               onChange={(e) => setEnquiryMessage(e.target.value)}
               style={{
@@ -406,8 +536,61 @@ function Properties() {
             >
               {enquiryLoading
                 ? "Sending..."
-                : "📩 Send Enquiry"}
+                : "📩 Send Instant Enquiry"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* AUTHENTICITY CERTIFICATE SEARCH MODAL */}
+      {showVerifyModal && (
+        <div style={overlayStyle} onClick={() => setShowVerifyModal(false)}>
+          <div style={{ ...modalStyle, maxWidth: "600px" }} onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowVerifyModal(false)}
+              style={closeButton}
+            >
+              ✕
+            </button>
+
+            <h2>🔍 Check Property Authenticity</h2>
+            <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "20px" }}>
+              Verify if a property exists in official records and who is the registered legal title holder.
+            </p>
+
+            <form onSubmit={handleCheckAuthenticity} style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+              <input
+                type="text"
+                placeholder="Enter Property ID or Registry Deed Number..."
+                value={verifySearchQuery}
+                onChange={(e) => setVerifySearchQuery(e.target.value)}
+                style={{ ...inputStyle, border: "2px solid #10b981" }}
+                required
+              />
+              <button type="submit" style={{ ...searchButton, background: "#10b981", whiteSpace: "nowrap" }} disabled={verifySearchLoading}>
+                {verifySearchLoading ? "Searching..." : "Verify"}
+              </button>
+            </form>
+
+            {verifySearchResult && (
+              <div>
+                {verifySearchResult.found && verifySearchResult.verification ? (
+                  <div style={{ background: "#fcfbf7", border: "2px solid #b08a3e", borderRadius: "12px", padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px", color: "#1e293b" }}>🏛️ Official Property Title Certificate</h3>
+                    <p><strong>Property:</strong> {verifySearchResult.verification.title}</p>
+                    <p><strong>Location:</strong> {verifySearchResult.verification.location}</p>
+                    <p><strong>Registered Owner:</strong> <span style={{ color: "#166534", fontWeight: "bold" }}>{verifySearchResult.verification.owner_legal_name}</span></p>
+                    <p><strong>Registry Ref:</strong> <span style={{ color: "#b45309", fontWeight: "bold" }}>{verifySearchResult.verification.registry_number}</span></p>
+                    <p><strong>Status:</strong> <span style={{ color: "#10b981", fontWeight: "bold" }}>{verifySearchResult.verification.certificate_status}</span></p>
+                  </div>
+                ) : (
+                  <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: "16px", borderRadius: "8px", color: "#991b1b" }}>
+                    <h4>⚠️ Property Record Not Found</h4>
+                    <p>{verifySearchResult.message}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -456,13 +639,6 @@ const detailsButton = {
   fontWeight: "bold",
 };
 
-const cardStyle = {
-  background: "#fff",
-  borderRadius: "12px",
-  overflow: "hidden",
-  boxShadow: "0 4px 18px rgba(0,0,0,0.08)",
-};
-
 const overlayStyle = {
   position: "fixed",
   inset: 0,
@@ -507,32 +683,3 @@ const closeButton = {
 };
 
 export default Properties;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
