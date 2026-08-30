@@ -2895,5 +2895,22 @@ footer p {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
   }
+
+  .hero-visual {
+    margin-top: 25px !important;
+    width: 100% !important;
+  }
+
+  .hero-image-card img {
+    height: 220px !important;
+    border-radius: 14px !important;
+  }
+
+  .verified-floating-badge {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin-top: 10px !important;
+  }
 }
 

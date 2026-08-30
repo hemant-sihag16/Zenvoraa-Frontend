@@ -220,10 +220,7 @@
 }
 
 .nav-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  display: contents;
 }
 
 .mobile-toggle-btn {
@@ -239,6 +236,13 @@
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 900px) {
+  .nav-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
   .navbar {
     flex-direction: column !important;
     align-items: stretch !important;

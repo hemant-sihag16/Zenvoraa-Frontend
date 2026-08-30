@@ -1,4 +1,4 @@
-﻿import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar";
 function Contact() {
   return (
     <>
@@ -85,10 +85,25 @@ function Contact() {
             borderRadius: "18px",
           }}
         >
-          <h3>🏠 Zenvoraa</h3>
+          <h3>📞 Phone Support</h3>
 
-          <p style={{ color: "#cbd5e1" }}>
-            Smart Real Estate Platform
+          <p style={{ color: "#cbd5e1", fontSize: "17px" }}>
+            +91 9050978815
+          </p>
+        </div>
+
+        <div
+          style={{
+            marginTop: "18px",
+            background: "#1e293b",
+            padding: "25px",
+            borderRadius: "18px",
+          }}
+        >
+          <h3>📍 Head Office Location</h3>
+
+          <p style={{ color: "#cbd5e1", fontSize: "17px" }}>
+            Sirsa, Haryana, India
           </p>
         </div>        
         <div

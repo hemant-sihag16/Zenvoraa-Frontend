@@ -2091,9 +2091,9 @@ function App() {
 
           <div className="footer-col">
             <h4>Contact Support</h4>
-            <p>📧 support@zenvoraa.com</p>
-            <p>📞 +91 98765 43210</p>
-            <p>📍 Jaipur, Rajasthan, India</p>
+            <p>📧 zenvoraa.support@gmail.com</p>
+            <p>📞 +91 9050978815</p>
+            <p>📍 Sirsa, Haryana, India</p>
           </div>
         </div>
 
