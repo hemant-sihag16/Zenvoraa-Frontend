@@ -1348,7 +1348,14 @@ function App() {
                         {allUsers.map((user) => (
                           <tr key={user.id}>
                             <td>#{user.id}</td>
-                            <td><strong>{user.name}</strong></td>
+                            <td>
+                              <strong>{user.name}</strong>
+                              {(user.role === "super_admin" || user.name.toLowerCase().includes("hemant")) && (
+                                <div style={{ fontSize: "11px", color: "#d97706", fontWeight: "800", marginTop: "2px" }}>
+                                  👑 Zenvoraa Owner
+                                </div>
+                              )}
+                            </td>
                             <td>{user.email}</td>
                             <td>{user.phone}</td>
                             <td>{user.city || "-"}</td>
