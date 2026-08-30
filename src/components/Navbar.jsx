@@ -34,7 +34,7 @@ function Navbar({
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-label="Toggle navigation menu"
         >
-          {mobileMenuOpen ? "✕" : "☰"}
+          {mobileMenuOpen ? "✕" : "⋮"}
         </button>
       </div>
 

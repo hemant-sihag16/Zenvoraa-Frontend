@@ -503,6 +503,30 @@ function App() {
   };
 
   // ==========================================
+  // SUPER ADMIN: DELETE USER
+  // ==========================================
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm(`Are you sure you want to delete user #${userId}?`)) return;
+
+    try {
+      const res = await fetch(`${API_URL}/customers/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.detail || "Failed to delete user");
+      }
+
+      alert(`✅ User #${userId} deleted successfully!`);
+      fetchAllUsers();
+      fetchPlatformStats();
+    } catch (err) {
+      alert("❌ " + err.message);
+    }
+  };
+
+  // ==========================================
   // SUPER ADMIN / ADMIN: VERIFY PROPERTY
   // ==========================================
   const handleVerifyPropertyAction = async (propertyId, actionStatus) => {
@@ -1317,6 +1341,7 @@ function App() {
                           <th>Listings</th>
                           <th>Inquiries</th>
                           <th>Change Role</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1339,13 +1364,33 @@ function App() {
                                 value={user.role}
                                 onChange={(e) => handleChangeUserRole(user.id, e.target.value)}
                                 className="role-dropdown"
-                                disabled={user.email === "owner@zenvoraa.com"}
+                                disabled={user.email === "owner@zenvoraa.com" || user.role === "super_admin"}
                               >
                                 <option value="customer">Customer / Buyer</option>
                                 <option value="house_owner">House Owner (Seller)</option>
                                 <option value="admin">Admin / Staff</option>
                                 <option value="super_admin">Super Admin (Owner)</option>
                               </select>
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn-delete-user"
+                                style={{
+                                  background: "rgba(239, 68, 68, 0.15)",
+                                  border: "1px solid #ef4444",
+                                  color: "#ef4444",
+                                  padding: "5px 10px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  fontSize: "12px",
+                                  fontWeight: "700"
+                                }}
+                                onClick={() => handleDeleteUser(user.id)}
+                                disabled={user.role === "super_admin"}
+                              >
+                                🗑️ Delete
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -2064,6 +2109,34 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Contact Support Home Tab Section */}
+      <section className="contact-support-home-section" style={{ background: "#0f172a", color: "#ffffff", padding: "60px 7%", borderTop: "1px solid #1e293b" }}>
+        <div style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}>
+          <span style={{ color: "#fbbf24", fontWeight: "800", fontSize: "13px", letterSpacing: "2px", textTransform: "uppercase" }}>24/7 CUSTOMER HELP</span>
+          <h2 style={{ fontSize: "36px", margin: "10px 0 25px", color: "#ffffff" }}>Contact Support</h2>
+          
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px", marginTop: "20px" }}>
+            <div style={{ background: "#1e293b", padding: "25px", borderRadius: "16px", border: "1px solid #334155" }}>
+              <div style={{ fontSize: "32px", marginBottom: "10px" }}>📧</div>
+              <h4 style={{ color: "#fbbf24", fontSize: "18px", margin: "0 0 8px" }}>Email Support</h4>
+              <p style={{ color: "#f8fafc", fontSize: "16px", margin: 0, fontWeight: "600" }}>zenvoraa.support@gmail.com</p>
+            </div>
+
+            <div style={{ background: "#1e293b", padding: "25px", borderRadius: "16px", border: "1px solid #334155" }}>
+              <div style={{ fontSize: "32px", marginBottom: "10px" }}>📞</div>
+              <h4 style={{ color: "#fbbf24", fontSize: "18px", margin: "0 0 8px" }}>Phone Support</h4>
+              <p style={{ color: "#f8fafc", fontSize: "16px", margin: 0, fontWeight: "600" }}>+91 9050978815</p>
+            </div>
+
+            <div style={{ background: "#1e293b", padding: "25px", borderRadius: "16px", border: "1px solid #334155" }}>
+              <div style={{ fontSize: "32px", marginBottom: "10px" }}>📍</div>
+              <h4 style={{ color: "#fbbf24", fontSize: "18px", margin: "0 0 8px" }}>Office Location</h4>
+              <p style={{ color: "#f8fafc", fontSize: "16px", margin: 0, fontWeight: "600" }}>Sirsa, Haryana, India</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="footer" id="contact">

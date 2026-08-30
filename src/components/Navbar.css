@@ -248,10 +248,19 @@
     align-items: stretch !important;
     padding: 12px 16px !important;
     gap: 12px;
+    background: #090d16 !important;
   }
 
   .mobile-toggle-btn {
     display: block;
+    background: #1e293b !important;
+    color: #fbbf24 !important;
+    border: 1px solid #334155 !important;
+    font-size: 24px;
+    padding: 4px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   .nav-links {
@@ -259,21 +268,36 @@
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 10px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px;
+    background: #0f172a !important; /* Dark menu dropdown container */
+    border-radius: 12px;
+    border: 1px solid #1e293b;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   }
 
   .nav-links.open {
     display: flex !important;
   }
 
+  /* DARK BUTTONS INSIDE THREE DOTS MOBILE MENU */
   .nav-links a,
   .nav-link-btn {
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 6px;
+    padding: 12px 16px !important;
+    background: #1e293b !important; /* Dark button background */
+    color: #f8fafc !important; /* Bright crisp text */
+    border: 1px solid #334155 !important; /* Dark slate border */
+    border-radius: 8px !important;
     text-align: left;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .nav-links a:hover,
+  .nav-link-btn:hover {
+    background: #334155 !important;
+    color: #fbbf24 !important;
+    border-color: #fbbf24 !important;
   }
 
   .navbar-actions {
@@ -281,7 +305,11 @@
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 10px;
-    padding-top: 10px;
+    padding: 14px;
+    background: #0f172a !important;
+    border-radius: 12px;
+    border: 1px solid #1e293b;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   }
 
   .navbar-actions.open {
@@ -293,7 +321,7 @@
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    gap: 8px;
+    gap: 10px;
   }
 
   .login-btn,
@@ -305,11 +333,22 @@
     text-align: center;
     padding: 12px 16px;
     font-size: 15px;
+    border-radius: 8px;
+    font-weight: 700;
+    box-sizing: border-box;
+  }
+
+  .guest-action-group .login-btn {
+    background: #1e293b !important;
+    color: #fbbf24 !important;
+    border: 1px solid #d97706 !important;
   }
 
   .user-profile-badge {
     justify-content: center;
     padding: 8px 12px;
+    background: #1e293b;
+    border-color: #334155;
   }
 }
 
